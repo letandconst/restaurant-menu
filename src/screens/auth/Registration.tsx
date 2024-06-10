@@ -48,7 +48,7 @@ const Registration = () => {
 
 			const authUser = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
 
-			await addDoc(collection(db, 'users'), {
+			await addDoc(collection(db, 'merchants'), {
 				businessName: formData.businessName,
 				phoneNumber: formData.phoneNumber,
 				email: formData.email,
