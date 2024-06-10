@@ -66,8 +66,6 @@ const SidebarContent = () => {
 		setOpen((prevOpen) => (prevOpen === label ? null : label));
 	};
 
-	console.log('auth', auth);
-
 	const handleLogout = async () => {
 		try {
 			await signOut(auth);
