@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { IconButton, InputAdornment, TextField } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { isValidEmail } from '../utils/helpers';
+import { isValidEmail } from '../../utils/helpers';
 
 interface FormInputProps {
 	type: string;
