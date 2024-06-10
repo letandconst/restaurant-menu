@@ -1,5 +1,7 @@
-import RegistrationForm from './Registration';
-import LoginForm from './Login';
+import RegistrationForm from './auth/Registration';
+import LoginForm from './auth/Login';
 import Dashboard from './Dashboard';
+import Items from './inventory/Items';
+import Categories from './inventory/Categories';
 
-export { RegistrationForm, LoginForm, Dashboard };
+export { RegistrationForm, LoginForm, Dashboard, Items, Categories };

@@ -1,23 +1,29 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { FormEvent, useState } from 'react';
 import { Button, Typography, Grid, Link, CircularProgress, Box } from '@mui/material';
+
 import { Link as RouterLink } from 'react-router-dom';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { collection, addDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { auth } from '../../firebase.config.ts';
-import { FirebaseErrorMessages } from '../types/FirebaseErrorMessages.ts';
+import { auth, db } from '../../../firebase.config.ts';
 
-import FormInput from '../components/FormInput.tsx';
-import { isValidEmail } from '../utils/helpers.tsx';
-import FormWrapper from './modules/FormWrapper.tsx';
+import { FirebaseErrorMessages } from '../../types/FirebaseErrorMessages.ts';
+import FormWrapper from '../../components/Form/modules/FormWrapper.tsx';
+import FormInput from '../../components/Form/FormInput.tsx';
+import { isValidEmail } from '../../utils/helpers.tsx';
 
-interface LoginFormData {
+interface RegistrationFormData {
+	businessName: string;
+	phoneNumber: string;
 	email: string;
 	password: string;
 }
 
-const Login = () => {
-	const [formData, setFormData] = useState<LoginFormData>({
+const Registration = () => {
+	const [formData, setFormData] = useState<RegistrationFormData>({
+		businessName: '',
+		phoneNumber: '',
 		email: '',
 		password: '',
 	});
@@ -32,7 +38,7 @@ const Login = () => {
 		e.preventDefault();
 
 		try {
-			if (!formData.email || !isValidEmail(formData.email) || !formData.password) {
+			if (!formData.businessName || !formData.phoneNumber || !formData.email || !isValidEmail(formData.email) || !formData.password) {
 				setShowError(true);
 				return;
 			}
@@ -40,17 +46,23 @@ const Login = () => {
 			setLoading(true);
 			setShowError(false);
 
-			const data = await signInWithEmailAndPassword(auth, formData.email, formData.password);
-			const uid = data.user.uid;
+			const authUser = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
 
-			localStorage.setItem('uid', uid);
+			await addDoc(collection(db, 'users'), {
+				businessName: formData.businessName,
+				phoneNumber: formData.phoneNumber,
+				email: formData.email,
+				userId: authUser.user.uid,
+			});
 
-			navigate('/');
+			navigate('/signin');
 		} catch (err: any) {
 			const errorMessage = FirebaseErrorMessages(err);
 			setError(errorMessage);
 			setShowToast(true);
 			setFormData({
+				businessName: '',
+				phoneNumber: '',
 				email: '',
 				password: '',
 			});
@@ -77,24 +89,58 @@ const Login = () => {
 					variant='h5'
 					component='h1'
 				>
-					Login
+					Register
 				</Typography>
 				<Typography variant='body2'>
 					<Link
 						component={RouterLink}
-						to='/signup'
+						to='/signin'
 						color='primary'
 					>
-						Don't have an account?
+						Already have an account?
 					</Link>
 				</Typography>
 			</Box>
-
+			{error && (
+				<Typography
+					variant='body2'
+					color='error'
+					gutterBottom
+				>
+					{error}
+				</Typography>
+			)}
 			<form onSubmit={handleSubmit}>
 				<Grid
 					container
 					spacing={2}
 				>
+					<Grid
+						item
+						xs={12}
+					>
+						<FormInput
+							type='string'
+							label='Business Name'
+							name='businessName'
+							value={formData.businessName}
+							onChange={(value) => setFormData({ ...formData, businessName: value })}
+							errMessage={showError && !formData.businessName ? 'Business name is required' : ''}
+						/>
+					</Grid>
+					<Grid
+						item
+						xs={12}
+					>
+						<FormInput
+							type='string'
+							label='Phone Number'
+							name='phoneNumber'
+							value={formData.phoneNumber}
+							onChange={(value) => setFormData({ ...formData, phoneNumber: value })}
+							errMessage={showError && !formData.phoneNumber ? 'Phone number is required' : ''}
+						/>
+					</Grid>
 					<Grid
 						item
 						xs={12}
@@ -138,7 +184,7 @@ const Login = () => {
 									color='inherit'
 								/>
 							) : (
-								'Login'
+								'Register'
 							)}
 						</Button>
 					</Grid>
@@ -148,4 +194,4 @@ const Login = () => {
 	);
 };
 
-export default Login;
+export default Registration;
