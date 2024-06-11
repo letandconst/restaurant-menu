@@ -2,13 +2,18 @@
 import { useState, useEffect } from 'react';
 import { DataTable, Modal, PopupNotif, DeletePopup } from '../../components';
 
-import { auth, db } from '../../../firebase.config.ts';
-import { addDoc, collection, deleteDoc, doc, getDocs, query, updateDoc, where } from 'firebase/firestore';
+import { auth, db, storage } from '../../../firebase.config.ts';
+import { addDoc, collection, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { getDownloadURL, uploadBytes, ref } from 'firebase/storage';
+
+import CategoryForm from './modules/CategoryForm.tsx';
+import { generateFilename } from '../../utils/helpers.tsx';
 import { Category } from '../../services/models/Category.ts';
+import useCategories from '../../hooks/useCategories.ts';
 
 const Categories = () => {
 	const [categories, setCategories] = useState<{ id: string }[]>([]);
-	const [modalData, setModalData] = useState<{
+	const [data, setData] = useState<{
 		open: boolean;
 		title: string;
 		fields: { name: string; label: string; type?: string }[];
@@ -25,11 +30,12 @@ const Categories = () => {
 	const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
 	const [snackbarMessage, setSnackbarMessage] = useState<string>('');
 	const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error' | 'warning' | 'info'>('success');
-	const [loading, setLoading] = useState<boolean>(true);
+
+	const { categoriesList, loading } = useCategories();
 
 	// Show modal for "Add" or "Edit"
 	const handleOpenModal = (title: string, fields: { name: string; label: string; type?: string }[], initialData: Record<string, any> = {}) => {
-		setModalData({
+		setData({
 			open: true,
 			title,
 			fields,
@@ -39,8 +45,8 @@ const Categories = () => {
 
 	// Hide modal for "Add" or "Edit"
 	const handleCloseModal = () => {
-		setModalData((prevModalData) => ({
-			...prevModalData,
+		setData((prevData) => ({
+			...prevData,
 			open: false,
 		}));
 	};
@@ -59,11 +65,31 @@ const Categories = () => {
 	// Handle Adding New Category
 	const handleAddNew = async (data: Record<string, any>) => {
 		try {
+			let imageUrl = '';
+			if (data.photo) {
+				const newFileName = generateFilename();
+				const storageRef = ref(storage, `categories/${newFileName}`);
+				const snapshot = await uploadBytes(storageRef, data.photo);
+				imageUrl = await getDownloadURL(snapshot.ref);
+			}
+
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			const { photo, ...prevData } = data;
+
 			const docRef = await addDoc(collection(db, 'categories'), {
 				merchantId: auth.currentUser?.uid,
-				...data,
+				createdAt: Date.now(),
+				photo: imageUrl,
+				...prevData,
 			});
-			const newCategory = { id: docRef.id, ...data };
+
+			const newCategory = {
+				id: docRef.id,
+				createdAt: Date.now(),
+				photo: imageUrl,
+				...prevData,
+			};
+
 			setCategories((prevCategories) => [...prevCategories, newCategory]);
 			setSnackbarMessage('Category added successfully!');
 			setSnackbarSeverity('success');
@@ -80,8 +106,24 @@ const Categories = () => {
 	// Handle Updating Category
 	const handleEdit = async (data: Record<string, any>) => {
 		try {
-			await updateDoc(doc(db, 'categories', data.id), data);
-			const updatedCategories = categories.map((category) => (category.id === data.id ? { ...category, ...data } : category));
+			let imageUrl = data.photo;
+
+			if (data.photo instanceof File) {
+				const newFileName = generateFilename();
+				const storageRef = ref(storage, `categories/${newFileName}`);
+				const snapshot = await uploadBytes(storageRef, data.photo);
+				imageUrl = await getDownloadURL(snapshot.ref);
+			}
+
+			const updatedData = {
+				...data,
+				updatedAt: Date.now(),
+				photo: imageUrl,
+			};
+
+			await updateDoc(doc(db, 'categories', data.id), updatedData);
+			const updatedCategories = categories.map((category) => (category.id === data.id ? { ...category, ...updatedData } : category));
+
 			setCategories(updatedCategories);
 			setSnackbarMessage('Category updated successfully!');
 			setSnackbarSeverity('success');
@@ -117,46 +159,21 @@ const Categories = () => {
 
 	// Category Table Modal Fields
 	const fields = [
-		{ name: 'name', label: 'Name' },
-		{ name: 'description', label: 'Description' },
+		{ name: 'photo', label: 'Photo', type: 'file' },
+		{ name: 'name', label: 'Name', type: 'text' },
+		{ name: 'description', label: 'Description', type: 'text' },
 	];
 
 	// Fetch category by merchant ID in Firebase
 	useEffect(() => {
-		const fetchCategories = async () => {
-			try {
-				const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
-					console.log('current', currentUser);
-					if (currentUser) {
-						const categoriesRef = collection(db, 'categories');
-						const categoriesQuery = query(categoriesRef, where('merchantId', '==', currentUser.uid));
-						const querySnapshot = await getDocs(categoriesQuery);
-						const categoriesData = querySnapshot.docs.map((doc) => ({
-							id: doc.id,
-							...doc.data(),
-						}));
-						setCategories(categoriesData);
-						setLoading(false);
-					} else {
-						setCategories([]);
-						setLoading(true);
-					}
-				});
-
-				return () => unsubscribe();
-			} catch (error) {
-				console.error('Error fetching categories:', error);
-			}
-		};
-
-		fetchCategories();
-	}, []);
+		setCategories(categoriesList);
+	}, [categoriesList]);
 
 	return (
 		<>
 			<DataTable
 				tableLabel='Categories'
-				headers={['id', 'name', 'description']}
+				headers={['id', 'photo', 'name', 'description', 'createdAt', 'updatedAt']}
 				data={categories}
 				onAddNew={() => handleOpenModal('Add New Category', fields)}
 				onEdit={(rowData) => handleOpenModal('Edit Category', fields, rowData)}
@@ -164,13 +181,16 @@ const Categories = () => {
 				loading={loading}
 			/>
 			<Modal
-				open={modalData.open}
-				title={modalData.title}
-				fields={modalData.fields}
+				open={data.open}
+				title={data.title}
 				onClose={handleCloseModal}
-				onSubmit={modalData.title.startsWith('Add') ? handleAddNew : handleEdit}
-				initialData={modalData.initialData}
-			/>
+			>
+				<CategoryForm
+					initialData={data.initialData}
+					onSubmit={data.title.startsWith('Add') ? handleAddNew : handleEdit}
+					onClose={handleCloseModal}
+				/>
+			</Modal>
 			<DeletePopup
 				open={showDeletePopup}
 				onClose={closeDeleteConfirmation}

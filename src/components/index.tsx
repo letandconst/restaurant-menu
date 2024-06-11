@@ -6,4 +6,7 @@ import Modal from './Modal/Modal';
 import DeletePopup from './Modal/modules/DeletePopup';
 import PopupNotif from './Notification/PopupNotif';
 
-export { DataTable, Modal, DeletePopup, PopupNotif };
+// Image Uploader
+import ImageUploader from './Form/ImageUploader';
+
+export { DataTable, Modal, DeletePopup, PopupNotif, ImageUploader };

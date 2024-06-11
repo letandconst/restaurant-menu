@@ -3,11 +3,11 @@ import { DataTable, Modal } from '../../components';
 
 const itemHeaders = ['ID', 'Photo', 'Item Name', 'Item Category', 'Option', 'Price', 'Cost', 'Modifiers'];
 const itemData = [
-	{ ID: 1, Photo: 'https://fastly.picsum.photos/id/237/200/200.jpg?hmac=zHUGikXUDyLCCmvyww1izLK3R3k8oRYBRiTizZEdyfI', 'Item Name': 'Sample', 'Item Category': 'Meat', Option: ['Small', 'Medium', 'Large'], Price: 50, Cost: 60, Modifiers: '' },
+	{ ID: 1, photo: '', 'Item Name': 'Sample', 'Item Category': 'Meat', Option: ['Small', 'Medium', 'Large'], Price: 50, Cost: 60, Modifiers: '' },
 
-	{ ID: 2, Photo: 'https://fastly.picsum.photos/id/117/200/200.jpg?hmac=hAXY0lMbkjkxYIKxW0UjtazVquGY1NCu3ruHLJGc4gs', 'Item Name': 'Sample 2', 'Item Category': 'Meat', Option: ['Small', 'Medium', 'Large'], Price: 50, Cost: 60, Modifiers: '' },
-	{ ID: 3, Photo: 'https://fastly.picsum.photos/id/146/200/200.jpg?hmac=BEfC1fMGgqn0zNUowEDrlnKsAisQSg9rYB7RxuXpTb4', 'Item Name': 'Sample 3', 'Item Category': 'Meat', Option: ['Small', 'Medium', 'Large'], Price: 50, Cost: 60, Modifiers: '' },
-	{ ID: 4, Photo: 'https://fastly.picsum.photos/id/838/200/200.jpg?hmac=a2ZUJPqhEFH-OzhHFaKdtDdV2XnIE7t1tP2iXnP5Fj0', 'Item Name': 'Sample 4 ', 'Item Category': 'Meat', Option: ['Small', 'Medium', 'Large'], Price: 50, Cost: 60, Modifiers: '' },
+	{ ID: 2, photo: '', 'Item Name': 'Sample 2', 'Item Category': 'Meat', Option: ['Small', 'Medium', 'Large'], Price: 50, Cost: 60, Modifiers: '' },
+	{ ID: 3, photo: '', 'Item Name': 'Sample 3', 'Item Category': 'Meat', Option: ['Small', 'Medium', 'Large'], Price: 50, Cost: 60, Modifiers: '' },
+	{ ID: 4, photo: '', 'Item Name': 'Sample 4 ', 'Item Category': 'Meat', Option: ['Small', 'Medium', 'Large'], Price: 50, Cost: 60, Modifiers: '' },
 ];
 
 const Items = () => {
@@ -37,24 +37,14 @@ const Items = () => {
 		console.log('Edit category:', data);
 	};
 
-	const addFields = [
-		{ name: 'photo', label: 'Photo' },
-		{ name: 'itemName', label: 'Item Name' },
-		{ name: 'itemCategory', label: 'Item Category' },
-		{ name: 'option', label: 'Option' },
-		{ name: 'price', label: 'Price' },
-		{ name: 'cost', label: 'Cost' },
-		{ name: 'modifiers', label: 'Modifiers' },
-	];
-
-	const editFields = [
-		{ name: 'photo', label: 'Photo' },
-		{ name: 'itemName', label: 'Item Name' },
-		{ name: 'itemCategory', label: 'Item Category' },
-		{ name: 'option', label: 'Option' },
-		{ name: 'price', label: 'Price' },
-		{ name: 'cost', label: 'Cost' },
-		{ name: 'modifiers', label: 'Modifiers' },
+	const fields = [
+		{ name: 'photo', label: 'Photo', type: 'file' },
+		{ name: 'itemName', label: 'Item Name', type: 'text' },
+		{ name: 'itemCategory', label: 'Item Category', type: 'select', options: ['Category1', 'Category2', 'Category3'] },
+		{ name: 'option', label: 'Option', type: 'text' },
+		{ name: 'price', label: 'Price', type: 'number' },
+		{ name: 'cost', label: 'Cost', type: 'number' },
+		{ name: 'modifiers', label: 'Modifiers', type: 'text' },
 	];
 
 	return (
@@ -63,8 +53,10 @@ const Items = () => {
 				tableLabel='Items'
 				headers={itemHeaders}
 				data={itemData}
-				onAddNew={() => handleOpenModal('Add New Category', addFields)}
-				onEdit={(rowData) => handleOpenModal('Edit Category', editFields, rowData)}
+				onAddNew={() => handleOpenModal('Add New Item', fields)}
+				onEdit={(rowData) => handleOpenModal('Edit Item', fields, rowData)}
+				onDelete={(itemId) => console.log('item', itemId)}
+				loading={false}
 			/>
 			<Modal
 				open={modalOpen}

@@ -2,6 +2,7 @@
 import { ChangeEvent, useState } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, TextField, InputAdornment, Button, Grid, IconButton, CircularProgress, useMediaQuery, useTheme, Typography, Box } from '@mui/material';
 import { Search as SearchIcon, Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, Category as CategoryIcon, ArrowUpward as ArrowUpwardIcon, ArrowDownward as ArrowDownwardIcon } from '@mui/icons-material';
+import { formatDate } from '../../utils/helpers';
 
 interface DataTableProps {
 	tableLabel: string;
@@ -61,7 +62,15 @@ const DataTable = ({ tableLabel, headers, data, onAddNew, onEdit, onDelete, load
 
 	const filteredData = data.filter((row) => headers.some((header) => row[header].toString().toLowerCase().includes(searchQuery.toLowerCase())));
 
-	const sortedData = sortData(filteredData, getComparator(order, orderBy));
+	const formattedData = filteredData.map((row) => {
+		return {
+			...row,
+			createdAt: formatDate(row.createdAt),
+			updatedAt: formatDate(row.updatedAt),
+		};
+	});
+
+	const sortedData = sortData(formattedData, getComparator(order, orderBy));
 
 	return (
 		<Paper
@@ -152,24 +161,27 @@ const DataTable = ({ tableLabel, headers, data, onAddNew, onEdit, onDelete, load
 						}}
 					>
 						<TableRow>
-							{headers.map((header, index) => (
-								<TableCell
-									key={index}
-									onClick={() => handleSort(header)}
-									style={{ cursor: 'pointer' }}
-								>
-									<Box
-										sx={{
-											display: 'flex',
-											alignItems: 'center',
-											gap: '4px',
-										}}
+							{headers.map((header, index) => {
+								const formattedHeader = header === 'createdAt' ? 'Date Created' : header === 'updatedAt' ? 'Date Updated' : header;
+								return (
+									<TableCell
+										key={index}
+										onClick={() => handleSort(header)}
+										style={{ cursor: 'pointer' }}
 									>
-										<strong>{index === 0 ? header.toUpperCase() : header.charAt(0).toUpperCase() + header.slice(1)}</strong>
-										{orderBy === header ? order === 'asc' ? <ArrowUpwardIcon fontSize='small' /> : <ArrowDownwardIcon fontSize='small' /> : null}
-									</Box>
-								</TableCell>
-							))}
+										<Box
+											sx={{
+												display: 'flex',
+												alignItems: 'center',
+												gap: '4px',
+											}}
+										>
+											<strong>{index === 0 ? formattedHeader.toUpperCase() : formattedHeader.charAt(0).toUpperCase() + formattedHeader.slice(1)}</strong>
+											{orderBy === header ? order === 'asc' ? <ArrowUpwardIcon fontSize='small' /> : <ArrowDownwardIcon fontSize='small' /> : null}
+										</Box>
+									</TableCell>
+								);
+							})}
 							<TableCell>
 								<strong>Actions</strong>
 							</TableCell>
@@ -209,23 +221,24 @@ const DataTable = ({ tableLabel, headers, data, onAddNew, onEdit, onDelete, load
 							sortedData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, rowIndex) => (
 								<TableRow key={rowIndex}>
 									{headers.map((header, colIndex) => (
-										<>
-											<TableCell key={colIndex}>
-												{header === 'Photo' ? (
-													<img
-														src={row[header]}
-														alt='Item'
-														style={{ width: 50, height: 50 }}
-													/>
-												) : header === 'id' ? (
-													rowIndex + 1
-												) : typeof row[header] === 'string' ? (
-													row[header].charAt(0).toUpperCase() + row[header].slice(1)
-												) : (
-													row[header]
-												)}
-											</TableCell>
-										</>
+										<TableCell
+											key={colIndex}
+											style={{ width: tableLabel === 'Categories' && colIndex === 3 ? 450 : undefined }}
+										>
+											{header === 'photo' ? (
+												<img
+													src={row[header] ? row[header] : 'https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png'}
+													alt='Item'
+													style={{ width: 50, height: 50, borderRadius: 8 }}
+												/>
+											) : header === 'id' ? (
+												rowIndex + 1
+											) : typeof row[header] === 'string' ? (
+												row[header].charAt(0).toUpperCase() + row[header].slice(1)
+											) : (
+												row[header]
+											)}
+										</TableCell>
 									))}
 									<TableCell
 										sx={{
