@@ -86,10 +86,6 @@ const CategoryForm = ({ onClose, onSubmit, initialData }: CategoryFormProps) => 
 		}
 	}, []);
 
-	useEffect(() => {
-		console.log('preview value is updted', preview);
-	}, [preview]);
-
 	return (
 		<form onSubmit={handleSubmit}>
 			<Box

@@ -4,7 +4,6 @@ interface AuthError {
 }
 
 export const FirebaseErrorMessages = (error: AuthError): string => {
-	console.log('error', error.code);
 	switch (error.code) {
 		case 'auth/weak-password':
 			return 'The password is too weak.';
