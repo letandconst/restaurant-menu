@@ -1,6 +1,5 @@
-import Modal from '../../components/Modal/Modal';
 import { useState } from 'react';
-import DataTable from '../../components/DataTable/DataTable';
+import { DataTable, Modal } from '../../components';
 
 const itemHeaders = ['ID', 'Photo', 'Item Name', 'Item Category', 'Option', 'Price', 'Cost', 'Modifiers'];
 const itemData = [
@@ -61,6 +60,7 @@ const Items = () => {
 	return (
 		<>
 			<DataTable
+				tableLabel='Items'
 				headers={itemHeaders}
 				data={itemData}
 				onAddNew={() => handleOpenModal('Add New Category', addFields)}
