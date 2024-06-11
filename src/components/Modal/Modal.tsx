@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Dialog, DialogTitle, DialogContent, Grid, TextField, DialogActions, Button } from '@mui/material';
-import React, { useEffect } from 'react';
+import { ChangeEvent, useState, useEffect } from 'react';
 
 interface ModalProps {
 	open: boolean;
@@ -12,17 +12,42 @@ interface ModalProps {
 }
 
 const Modal = ({ open, title, fields, onClose, onSubmit, initialData }: ModalProps) => {
-	const [formData, setFormData] = React.useState<Record<string, any>>(initialData || {});
+	const [formData, setFormData] = useState<Record<string, any>>(initialData || {});
+	const [errors, setErrors] = useState<Record<string, string>>({});
 
-	const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setFormData({
 			...formData,
 			[event.target.name]: event.target.value,
 		});
+
+		if (errors[event.target.name]) {
+			setErrors({
+				...errors,
+				[event.target.name]: '',
+			});
+		}
 	};
 
 	const handleSubmit = () => {
-		onSubmit(formData);
+		const newErrors: Record<string, string> = {};
+		fields.forEach((field) => {
+			if (!formData[field.name]) {
+				newErrors[field.name] = `${field.label} is required`;
+			}
+		});
+
+		if (Object.keys(newErrors).length > 0) {
+			setErrors(newErrors);
+		} else {
+			onSubmit(formData);
+			handleClose();
+		}
+	};
+
+	const handleClose = () => {
+		setFormData(initialData || {});
+		setErrors({});
 		onClose();
 	};
 
@@ -33,7 +58,7 @@ const Modal = ({ open, title, fields, onClose, onSubmit, initialData }: ModalPro
 	return (
 		<Dialog
 			open={open}
-			onClose={onClose}
+			onClose={handleClose}
 		>
 			<DialogTitle>{title}</DialogTitle>
 			<DialogContent
@@ -59,6 +84,8 @@ const Modal = ({ open, title, fields, onClose, onSubmit, initialData }: ModalPro
 								type={field.type || 'text'}
 								value={formData[field.name] || ''}
 								onChange={handleChange}
+								error={!!errors[field.name]}
+								helperText={errors[field.name]}
 							/>
 						</Grid>
 					))}
@@ -66,7 +93,7 @@ const Modal = ({ open, title, fields, onClose, onSubmit, initialData }: ModalPro
 			</DialogContent>
 			<DialogActions>
 				<Button
-					onClick={onClose}
+					onClick={handleClose}
 					color='primary'
 				>
 					Cancel

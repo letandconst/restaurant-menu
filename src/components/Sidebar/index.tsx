@@ -1,9 +1,9 @@
+import { Fragment, useEffect, useState } from 'react';
+import { getAuth, signOut } from 'firebase/auth';
+import { Link, useNavigate } from 'react-router-dom';
+
 import { DashboardOutlined, ExpandLess, ExpandMore, Inventory2Outlined, LogoutOutlined } from '@mui/icons-material';
 import { Box, Collapse, Drawer, List, ListItem, ListItemIcon, ListItemText, Typography, useMediaQuery, useTheme } from '@mui/material';
-import { getAuth, signOut } from 'firebase/auth';
-import React, { useState } from 'react';
-
-import { Link, useNavigate } from 'react-router-dom';
 
 interface SidebarProps {
 	open: boolean;
@@ -56,16 +56,19 @@ const Sidebar = ({ open, handleDrawerToggle }: SidebarProps) => {
 };
 
 const SidebarContent = () => {
-	const [open, setOpen] = useState<string | null>('Dashboard');
 	const auth = getAuth();
 	const navigate = useNavigate();
 	const theme = useTheme();
 	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
+	const [open, setOpen] = useState<string | null>(localStorage.getItem('activeMenuItem') || 'Dashboard');
+
+	// Handle Navigation Click
 	const handleClick = (label: string) => {
 		setOpen((prevOpen) => (prevOpen === label ? null : label));
 	};
 
+	// Handle Logout
 	const handleLogout = async () => {
 		try {
 			await signOut(auth);
@@ -90,6 +93,10 @@ const SidebarContent = () => {
 
 	const logoutMenuItem = { label: 'Logout', icon: <LogoutOutlined />, handler: handleLogout };
 
+	useEffect(() => {
+		localStorage.setItem('activeMenuItem', open || '');
+	}, [open]);
+
 	return (
 		<>
 			<Box>
@@ -103,7 +110,7 @@ const SidebarContent = () => {
 					}}
 				>
 					{menuItems.map((menuItem, index) => (
-						<React.Fragment key={index}>
+						<Fragment key={index}>
 							{menuItem.path ? (
 								<ListItem
 									component={Link}
@@ -210,6 +217,7 @@ const SidebarContent = () => {
 												key={subIndex}
 												component={Link}
 												to={subItem.path}
+												onClick={() => handleClick(subItem.label)}
 												sx={{
 													marginTop: '4px',
 													padding: '0 0 0 52px',
@@ -242,7 +250,7 @@ const SidebarContent = () => {
 									</List>
 								</Collapse>
 							)}
-						</React.Fragment>
+						</Fragment>
 					))}
 				</List>
 			</Box>
