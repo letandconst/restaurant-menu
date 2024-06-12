@@ -152,7 +152,7 @@ const DataTable = ({ tableLabel, headers, data, onAddNew, onEdit, onDelete, load
 					</Grid>
 				</Grid>
 			</Grid>
-			;
+
 			<TableContainer>
 				<Table>
 					<TableHead
