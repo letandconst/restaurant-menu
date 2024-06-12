@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { DataTable, Modal, PopupNotif, DeletePopup } from '../../components';
 
 import { auth, db, storage } from '../../../firebase.config.ts';
-import { addDoc, collection, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { ref as rtdbRef, push, update, remove } from 'firebase/database';
 import { getDownloadURL, uploadBytes, ref } from 'firebase/storage';
 
 import CategoryForm from './modules/CategoryForm.tsx';
@@ -76,21 +76,17 @@ const Categories = () => {
 			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			const { photo, ...prevData } = data;
 
-			const docRef = await addDoc(collection(db, 'categories'), {
-				merchantId: auth.currentUser?.uid,
-				createdAt: Date.now(),
-				photo: imageUrl,
-				...prevData,
-			});
+			const newCategoryRef = push(rtdbRef(db, 'categories'));
 
 			const newCategory = {
-				id: docRef.id,
+				id: newCategoryRef.key,
+				merchantId: auth.currentUser?.uid,
 				createdAt: Date.now(),
 				photo: imageUrl,
 				...prevData,
 			};
 
-			setCategories((prevCategories) => [...prevCategories, newCategory]);
+			update(newCategoryRef, newCategory);
 			setSnackbarMessage('Category added successfully!');
 			setSnackbarSeverity('success');
 			setSnackbarOpen(true);
@@ -121,10 +117,8 @@ const Categories = () => {
 				photo: imageUrl,
 			};
 
-			await updateDoc(doc(db, 'categories', data.id), updatedData);
-			const updatedCategories = categories.map((category) => (category.id === data.id ? { ...category, ...updatedData } : category));
+			await update(rtdbRef(db, `categories/${data.id}`), updatedData);
 
-			setCategories(updatedCategories);
 			setSnackbarMessage('Category updated successfully!');
 			setSnackbarSeverity('success');
 			setSnackbarOpen(true);
@@ -140,10 +134,10 @@ const Categories = () => {
 	// Handle Deleting Category
 	const handleDelete = async (category: Category) => {
 		try {
-			await deleteDoc(doc(db, 'categories', category.id));
-			setCategories(categories.filter((c) => c.id !== category.id));
+			await remove(rtdbRef(db, `categories/${category.id}`));
 			setSnackbarMessage('Category deleted successfully!');
 			setSnackbarSeverity('success');
+			setSnackbarOpen(true);
 			setShowDeletePopup(false);
 		} catch (error) {
 			console.error('Error deleting category:', error);

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChangeEvent, FocusEvent, FormEvent, useEffect, useState } from 'react';
+import { Box, Button, FormControl, TextField, Typography } from '@mui/material';
 import { ImageUploader } from '../../../components';
-import { Box, Button, Divider, TextField } from '@mui/material';
 
 interface CategoryFormProps {
 	onClose: () => void;
@@ -84,60 +84,81 @@ const CategoryForm = ({ onClose, onSubmit, initialData }: CategoryFormProps) => 
 		if (formData) {
 			setPreview(formData.photo);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return (
 		<form onSubmit={handleSubmit}>
 			<Box
 				sx={{
-					display: 'flex',
-					gap: '18px',
+					padding: ' 0 24px 24px',
+					'input, .MuiSelect-select': {
+						padding: '10px 12px',
+					},
+
+					'.MuiFormControl-fullWidth': {
+						gap: '4px',
+
+						'.Mui-error': {
+							marginLeft: '0',
+						},
+					},
 				}}
 			>
-				<ImageUploader
-					preview={preview ?? formData.photo}
-					handleFileChange={handleFileChange}
-				/>
+				<Box>
+					<ImageUploader
+						preview={preview ?? formData.photo}
+						handleFileChange={handleFileChange}
+					/>
+				</Box>
 				<Box
 					sx={{
-						'div:not(:first-of-type)': {
-							marginTop: '12px',
+						'> div': {
+							marginTop: '16px',
 						},
 					}}
 				>
-					<TextField
-						fullWidth
-						label='Name'
-						name='name'
-						value={formData.name || ''}
-						onChange={handleChange}
-						onBlur={handleBlur}
-						error={errors.name}
-						helperText={errors.name ? 'Name is required' : ''}
-					/>
-					<TextField
-						fullWidth
-						multiline
-						label='Description'
-						name='description'
-						value={formData.description || ''}
-						onChange={handleChange}
-						onBlur={handleBlur}
-						error={errors.description}
-						helperText={errors.description ? 'Description is required' : ''}
-					/>
+					<FormControl fullWidth>
+						<Typography className='form-label'>Category Name</Typography>
+						<TextField
+							fullWidth
+							placeholder='Enter category name'
+							type='text'
+							name='name'
+							value={formData.name || ''}
+							onChange={handleChange}
+							onBlur={handleBlur}
+							error={errors.name}
+							helperText={errors.name ? 'Name is required' : ''}
+							autoComplete='off'
+						/>
+					</FormControl>
+					<FormControl fullWidth>
+						<Typography className='form-label'>Category Description</Typography>
+						<TextField
+							fullWidth
+							multiline
+							placeholder='Enter category description'
+							type='text'
+							name='description'
+							value={formData.description || ''}
+							onChange={handleChange}
+							onBlur={handleBlur}
+							error={errors.description}
+							helperText={errors.description ? 'Description is required' : ''}
+							autoComplete='off'
+						/>
+					</FormControl>
 				</Box>
 			</Box>
-			<Divider
-				sx={{
-					margin: '24px 0',
-				}}
-			/>
+
+			{/* Form Action Section*/}
 			<Box
 				sx={{
 					display: 'flex',
 					gap: '18px',
 					justifyContent: 'flex-end',
+					padding: '24px 24px 16px',
 				}}
 			>
 				<Button
