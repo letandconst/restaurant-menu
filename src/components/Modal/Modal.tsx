@@ -14,12 +14,11 @@ const Modal = ({ open, title, onClose, children }: ModalProps) => {
 			open={open}
 			onClose={onClose}
 			className='here'
-			sx={{}}
 		>
 			<DialogTitle>{title}</DialogTitle>
 			<DialogContent
 				sx={{
-					padding: '16px!important',
+					padding: '0!important',
 				}}
 			>
 				{children}
