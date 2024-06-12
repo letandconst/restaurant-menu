@@ -233,6 +233,14 @@ const DataTable = ({ tableLabel, headers, data, onAddNew, onEdit, onDelete, load
 												/>
 											) : header === 'id' ? (
 												rowIndex + 1
+											) : header === 'variants' ? (
+												<ul>
+													{row[header].map((variant: any, index: number) => (
+														<li key={index}>
+															Name: {variant.name}, Price: {variant.price}, Cost: {variant.cost}
+														</li>
+													))}
+												</ul>
 											) : typeof row[header] === 'string' ? (
 												row[header].charAt(0).toUpperCase() + row[header].slice(1)
 											) : (
