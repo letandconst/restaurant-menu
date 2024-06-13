@@ -4,7 +4,7 @@ import { Button, Typography, Grid, Link, CircularProgress, Box } from '@mui/mate
 
 import { Link as RouterLink } from 'react-router-dom';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { collection, addDoc } from 'firebase/firestore';
+import { ref, set } from 'firebase/database';
 import { useNavigate } from 'react-router-dom';
 import { auth, db } from '../../../firebase.config.ts';
 
@@ -28,7 +28,8 @@ const Registration = () => {
 		password: '',
 	});
 
-	const [error, setError] = useState<string | null>(null);
+	const [msgType, setMsgType] = useState<'success' | 'error' | 'warning' | 'info'>('success');
+	const [message, setMessage] = useState<string | null>(null);
 	const [showError, setShowError] = useState<boolean>(false);
 	const [showToast, setShowToast] = useState<boolean>(false);
 	const [loading, setLoading] = useState(false);
@@ -48,17 +49,24 @@ const Registration = () => {
 
 			const authUser = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
 
-			await addDoc(collection(db, 'merchants'), {
+			await set(ref(db, 'merchants/' + authUser.user.uid), {
 				businessName: formData.businessName,
 				phoneNumber: formData.phoneNumber,
 				email: formData.email,
 				userId: authUser.user.uid,
 			});
 
-			navigate('/signin');
+			setMessage('User successfully registered!');
+			setMsgType('success');
+			setShowToast(true);
+
+			setTimeout(() => {
+				navigate('/signin');
+			}, 1000);
 		} catch (err: any) {
 			const errorMessage = FirebaseErrorMessages(err);
-			setError(errorMessage);
+			setMessage(errorMessage);
+			setMsgType('error');
 			setShowToast(true);
 			setFormData({
 				businessName: '',
@@ -76,8 +84,9 @@ const Registration = () => {
 
 	return (
 		<FormWrapper
-			error={showToast}
-			errMessage={error}
+			showPopup={showToast}
+			message={message}
+			type={msgType}
 		>
 			<Box
 				display='flex'
@@ -101,15 +110,7 @@ const Registration = () => {
 					</Link>
 				</Typography>
 			</Box>
-			{error && (
-				<Typography
-					variant='body2'
-					color='error'
-					gutterBottom
-				>
-					{error}
-				</Typography>
-			)}
+
 			<form onSubmit={handleSubmit}>
 				<Grid
 					container
@@ -177,6 +178,10 @@ const Registration = () => {
 							color='primary'
 							fullWidth
 							disabled={loading}
+							sx={{
+								padding: '16px',
+								marginTop: '12px',
+							}}
 						>
 							{loading ? (
 								<CircularProgress

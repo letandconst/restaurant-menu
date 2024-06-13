@@ -1,17 +1,32 @@
-import { Avatar, Box, ButtonBase, Typography, useMediaQuery, useTheme } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
-import { useEffect, useState } from 'react';
-import { auth } from '../../../firebase.config.ts';
+import { Box, Typography, useMediaQuery, useTheme } from '@mui/material';
 
-const Header = ({ handleLeftDrawerToggle }: { handleLeftDrawerToggle: () => void }) => {
+import { useEffect, useState } from 'react';
+import { ref, get } from 'firebase/database';
+import { auth, db } from '../../../firebase.config.ts';
+
+const Header = () => {
 	const [currentUser, setCurrentUser] = useState<string | null>(null);
 
 	const theme = useTheme();
 	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
 	useEffect(() => {
 		const unsubscribe = auth.onAuthStateChanged(async (user) => {
 			if (user) {
-				setCurrentUser(user.email);
+				const userRef = ref(db, `merchants/${user.uid}`);
+				get(userRef)
+					.then((snapshot) => {
+						if (snapshot.exists()) {
+							const userData = snapshot.val();
+							setCurrentUser(userData.businessName);
+						} else {
+							setCurrentUser(null);
+						}
+					})
+					.catch((error) => {
+						console.error('Error fetching user:', error);
+						setCurrentUser(null);
+					});
 			} else {
 				setCurrentUser(null);
 			}
@@ -36,26 +51,8 @@ const Header = ({ handleLeftDrawerToggle }: { handleLeftDrawerToggle: () => void
 				>
 					Logo
 				</Box>
-				<ButtonBase sx={{ borderRadius: '8px', overflow: 'hidden' }}>
-					<Avatar
-						variant='rounded'
-						sx={{
-							transition: 'all .2s ease-in-out',
-							background: '#1e88e5',
-							color: '#ffffff',
-							'&:hover': {
-								background: '#1e88e5',
-								color: '#ffffff',
-							},
-						}}
-						onClick={handleLeftDrawerToggle}
-						color='inherit'
-					>
-						<MenuIcon />
-					</Avatar>
-				</ButtonBase>
 			</Box>
-			<Typography>Welcome, {currentUser}</Typography>
+			<Typography>Hello, {currentUser}</Typography>
 		</>
 	);
 };

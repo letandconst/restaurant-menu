@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ChangeEvent, FocusEvent, FormEvent, useEffect, useState } from 'react';
-import { Box, Button, Collapse, FormControl, FormHelperText, IconButton, MenuItem, Select, SelectChangeEvent, TextField, Typography } from '@mui/material';
+import { Box, Button, Chip, Collapse, FormControl, FormHelperText, IconButton, MenuItem, Select, SelectChangeEvent, TextField, Typography } from '@mui/material';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import IndeterminateCheckBoxOutlinedIcon from '@mui/icons-material/IndeterminateCheckBoxOutlined';
@@ -291,7 +291,21 @@ const ItemForm = ({ onClose, onSubmit, initialData }: ItemFormProps) => {
 						mt: '14px',
 					}}
 				>
-					<Typography className='form-label'>Variants</Typography>
+					<Box
+						sx={{
+							display: 'flex',
+							alignItems: 'center',
+							gap: '8px',
+						}}
+					>
+						<Typography className='form-label'>Variants</Typography>
+						<Chip
+							label={formData.variants.length}
+							variant='outlined'
+							color='primary'
+						/>
+					</Box>
+
 					<IconButton
 						onClick={handleExpandClick}
 						aria-expanded={expanded}

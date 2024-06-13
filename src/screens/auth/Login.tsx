@@ -22,7 +22,8 @@ const Login = () => {
 		password: '',
 	});
 
-	const [error, setError] = useState<string | null>(null);
+	const [msgType, setMsgType] = useState<'success' | 'error' | 'warning' | 'info'>('success');
+	const [message, setMessage] = useState<string>('');
 	const [showError, setShowError] = useState<boolean>(false);
 	const [showToast, setShowToast] = useState<boolean>(false);
 	const [loading, setLoading] = useState(false);
@@ -44,11 +45,17 @@ const Login = () => {
 			const uid = data.user.uid;
 
 			localStorage.setItem('uid', uid);
+			setMessage('User successfully login!');
+			setMsgType('success');
+			setShowToast(true);
 
-			navigate('/');
+			setTimeout(() => {
+				navigate('/');
+			}, 1000);
 		} catch (err: any) {
 			const errorMessage = FirebaseErrorMessages(err);
-			setError(errorMessage);
+			setMessage(errorMessage);
+			setMsgType('error');
 			setShowToast(true);
 			setFormData({
 				email: '',
@@ -64,8 +71,9 @@ const Login = () => {
 
 	return (
 		<FormWrapper
-			error={showToast}
-			errMessage={error}
+			showPopup={showToast}
+			message={message}
+			type={msgType}
 		>
 			<Box
 				display='flex'
@@ -131,6 +139,10 @@ const Login = () => {
 							color='primary'
 							fullWidth
 							disabled={loading}
+							sx={{
+								padding: '16px',
+								marginTop: '12px',
+							}}
 						>
 							{loading ? (
 								<CircularProgress

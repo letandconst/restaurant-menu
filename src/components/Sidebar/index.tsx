@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { DashboardOutlined, ExpandLess, ExpandMore, Inventory2Outlined, LogoutOutlined } from '@mui/icons-material';
 import { Box, Collapse, Drawer, List, ListItem, ListItemIcon, ListItemText, Typography, useMediaQuery, useTheme } from '@mui/material';
-
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 interface SidebarProps {
 	open: boolean;
 	handleDrawerToggle: () => void;
@@ -38,17 +38,46 @@ const Sidebar = ({ open, handleDrawerToggle }: SidebarProps) => {
 					className={`sidebar-desktop ${open ? 'open' : 'closed'}`}
 					style={{
 						minWidth: '260px',
-						transform: open ? 'none' : 'translateX(-280px)',
+						transform: open ? 'none' : 'translateX(-260px)',
 						display: 'flex',
 						flexDirection: 'column',
 						transition: 'transform 0.3s ease-in-out',
-						overflow: 'hidden',
+
 						height: '100%',
-						padding: '72px 0 0',
+						padding: '72px 24px 12px',
 						background: '#ffffff',
+						position: 'relative',
+						boxShadow: '1px 0 6px rgba(0, 0, 0, 0.1)',
 					}}
 				>
 					<SidebarContent />
+					<Box
+						sx={{
+							position: 'absolute',
+							height: '100%',
+							right: '-32px',
+							display: 'flex',
+							justifyContent: 'center',
+							top: '57px',
+						}}
+					>
+						<Box
+							sx={{
+								background: '#ffffff',
+								width: '32px',
+								height: '32px',
+								display: 'flex',
+								justifyContent: 'center',
+								alignItems: 'center',
+								padding: '24px 0',
+								cursor: 'pointer',
+								transform: `rotate(${open ? '180deg' : '0deg'})`,
+							}}
+							onClick={handleDrawerToggle}
+						>
+							<ArrowForwardIosIcon />
+						</Box>
+					</Box>
 				</Box>
 			)}
 		</>
@@ -282,6 +311,7 @@ const SidebarContent = () => {
 					'& .icon': {
 						minWidth: 'max-content',
 						marginRight: '16px',
+						display: 'flex',
 					},
 				}}
 			>

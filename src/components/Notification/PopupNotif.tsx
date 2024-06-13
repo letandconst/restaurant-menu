@@ -2,9 +2,9 @@ import { Snackbar, Alert } from '@mui/material';
 
 interface PopupNotifProps {
 	open: boolean;
-	message: string;
+	message: string | null;
 	severity: 'success' | 'error' | 'warning' | 'info';
-	onClose: () => void;
+	onClose?: () => void;
 }
 
 const PopupNotif = ({ open, message, severity, onClose }: PopupNotifProps) => {
@@ -13,7 +13,7 @@ const PopupNotif = ({ open, message, severity, onClose }: PopupNotifProps) => {
 			open={open}
 			autoHideDuration={2500}
 			onClose={onClose}
-			anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+			anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
 		>
 			<Alert
 				onClose={onClose}

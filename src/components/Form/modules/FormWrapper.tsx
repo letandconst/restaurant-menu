@@ -1,15 +1,21 @@
-import { Container, Card, CardContent, Snackbar } from '@mui/material';
+import { Box, Card, CardContent } from '@mui/material';
+import { PopupNotif } from '../../index';
 
 interface FormWrapperProps {
 	children: React.ReactNode;
-	error: boolean;
-	errMessage: string | null;
+	showPopup: boolean;
+	message: string | null;
+	type: 'success' | 'error' | 'warning' | 'info';
 }
-const FormWrapper = ({ children, error, errMessage }: FormWrapperProps) => {
+const FormWrapper = ({ children, showPopup, message, type }: FormWrapperProps) => {
 	return (
-		<Container
-			maxWidth='sm'
+		<Box
 			sx={{
+				backgroundImage: 'url(plain-bg.jpg) ',
+				backgroundSize: 'cover',
+				backgroundRepeaat: 'no-repeat',
+				width: '100%',
+
 				display: 'flex',
 				alignItems: 'center',
 				justifyContent: 'center',
@@ -20,21 +26,23 @@ const FormWrapper = ({ children, error, errMessage }: FormWrapperProps) => {
 				},
 			}}
 		>
-			<Card variant='outlined'>
+			<Card
+				variant='outlined'
+				sx={{
+					padding: '24px',
+					maxWidth: '600px',
+				}}
+			>
 				<CardContent> {children} </CardContent>
 			</Card>
-			{error && (
-				<Snackbar
-					anchorOrigin={{
-						vertical: 'top',
-						horizontal: 'center',
-					}}
-					open={error}
-					autoHideDuration={1500}
-					message={errMessage}
+			{showPopup && (
+				<PopupNotif
+					open={showPopup}
+					message={message}
+					severity={type}
 				/>
 			)}
-		</Container>
+		</Box>
 	);
 };
 

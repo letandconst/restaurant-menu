@@ -90,6 +90,8 @@ const DataTable = ({ tableLabel, headers, data, onAddNew, onEdit, onDelete, load
 		<Paper
 			sx={{
 				padding: '16px',
+				boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1)',
+				borderRadius: '8px',
 			}}
 		>
 			<Grid
@@ -178,7 +180,7 @@ const DataTable = ({ tableLabel, headers, data, onAddNew, onEdit, onDelete, load
 						}}
 					>
 						<TableRow>
-							<TableCell />
+							{tableLabel === 'Items' && <TableCell className='shortCol' />}
 							{headers.map((header, index) => {
 								const formattedHeader = header === 'createdAt' ? 'Date Created' : header === 'updatedAt' ? 'Date Updated' : header;
 								return (
@@ -267,8 +269,6 @@ const DataTable = ({ tableLabel, headers, data, onAddNew, onEdit, onDelete, load
 											</TableCell>
 										)}
 
-										{tableLabel === 'Categories' && <TableCell className='shortCol' />}
-
 										{headers.map((header, colIndex) => (
 											<TableCell
 												key={colIndex}
@@ -297,7 +297,7 @@ const DataTable = ({ tableLabel, headers, data, onAddNew, onEdit, onDelete, load
 												minWidth: '190px',
 												maxWidth: '190px',
 												'> button': {
-													borderRadius: '4px',
+													borderRadius: '8px',
 													color: '#ffffff',
 													'&.edit': {
 														background: '#ffbc34',
