@@ -41,7 +41,7 @@ const Layout = () => {
 			>
 				<Toolbar
 					variant='dense'
-					sx={{ justifyContent: 'space-between' }}
+					sx={{ justifyContent: 'space-between', boxShadow: 'rgba(0, 0, 0, 0.1) 0 1px' }}
 				>
 					<Header handleLeftDrawerToggle={handleShowSidebar} />
 				</Toolbar>
@@ -51,7 +51,7 @@ const Layout = () => {
 					display: 'flex',
 					boxSizing: 'border-box',
 					padding: isMobile ? '0 16px' : '0 18px 0 ',
-					height: 'calc(100vh - 75px)',
+					height: 'calc(100dvh - 72px)',
 				}}
 			>
 				<Sidebar
@@ -68,6 +68,7 @@ const Layout = () => {
 						width: '100%',
 						transition: 'margin-left 0.3s ease-in-out',
 						height: '100%',
+						overflow: 'auto',
 					}}
 				>
 					<Outlet />

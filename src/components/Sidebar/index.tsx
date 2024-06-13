@@ -37,7 +37,7 @@ const Sidebar = ({ open, handleDrawerToggle }: SidebarProps) => {
 				<Box
 					className={`sidebar-desktop ${open ? 'open' : 'closed'}`}
 					style={{
-						width: '260px',
+						minWidth: '260px',
 						transform: open ? 'none' : 'translateX(-280px)',
 						display: 'flex',
 						flexDirection: 'column',

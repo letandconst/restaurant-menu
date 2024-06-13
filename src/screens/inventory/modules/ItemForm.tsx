@@ -105,8 +105,6 @@ const ItemForm = ({ onClose, onSubmit, initialData }: ItemFormProps) => {
 	const handleVariantChange = (index: number, event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		const { name, value } = event.target;
 
-		console.log('cur', name);
-		console.log('val', value);
 		setFormData((prevFormData) => {
 			const newVariants = [...prevFormData.variants];
 			newVariants[index] = {
@@ -123,11 +121,26 @@ const ItemForm = ({ onClose, onSubmit, initialData }: ItemFormProps) => {
 	const handleSubmit = (event: FormEvent) => {
 		event.preventDefault();
 
-		const newErrors: Record<string, boolean> = {
-			name: validateField(formData.name || ''),
-			price: validateField(formData.price || ''),
-			cost: validateField(formData.cost || ''),
-		};
+		const hasVariants = formData.variants.length > 0;
+
+		const newFormData = { ...formData };
+
+		let newErrors: Record<string, boolean> = {};
+
+		if (hasVariants) {
+			newFormData.price = '';
+			newFormData.cost = '';
+
+			newErrors = {
+				name: validateField(formData.name || ''),
+			};
+		} else {
+			newErrors = {
+				name: validateField(formData.name || ''),
+				price: validateField(formData.price || ''),
+				cost: validateField(formData.cost || ''),
+			};
+		}
 
 		setErrors(newErrors);
 
@@ -135,7 +148,7 @@ const ItemForm = ({ onClose, onSubmit, initialData }: ItemFormProps) => {
 
 		if (hasErrors) return;
 
-		onSubmit(formData);
+		onSubmit(newFormData);
 		handleClose();
 	};
 
@@ -244,8 +257,9 @@ const ItemForm = ({ onClose, onSubmit, initialData }: ItemFormProps) => {
 							onChange={handleChange}
 							onBlur={handleBlur}
 							error={errors.price}
-							helperText={errors.price ? 'Price is required' : ''}
+							helperText={formData.variants.length === 0 && errors.price ? 'Price is required' : ''}
 							autoComplete='off'
+							disabled={formData.variants.length}
 						/>
 					</FormControl>
 
@@ -260,8 +274,9 @@ const ItemForm = ({ onClose, onSubmit, initialData }: ItemFormProps) => {
 							onChange={handleChange}
 							onBlur={handleBlur}
 							error={errors.cost}
-							helperText={errors.cost ? 'Cost is required' : ''}
+							helperText={formData.variants.length === 0 && errors.cost ? 'Cost is required' : ''}
 							autoComplete='off'
+							disabled={formData.variants.length}
 						/>
 					</FormControl>
 				</Box>
@@ -389,7 +404,7 @@ const ItemForm = ({ onClose, onSubmit, initialData }: ItemFormProps) => {
 					display: 'flex',
 					gap: '18px',
 					justifyContent: 'flex-end',
-					padding: '24px 24px 16px',
+					padding: '0 24px 16px',
 				}}
 			>
 				<Button

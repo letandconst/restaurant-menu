@@ -24,7 +24,7 @@ const Header = ({ handleLeftDrawerToggle }: { handleLeftDrawerToggle: () => void
 		<>
 			<Box
 				sx={{
-					width: isMobile ? 'max-content' : '220px',
+					width: isMobile ? 'max-content' : '260px',
 					display: 'flex',
 					padding: '16px 0',
 					alignItems: 'center',

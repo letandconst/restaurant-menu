@@ -158,7 +158,7 @@ const CategoryForm = ({ onClose, onSubmit, initialData }: CategoryFormProps) => 
 					display: 'flex',
 					gap: '18px',
 					justifyContent: 'flex-end',
-					padding: '24px 24px 16px',
+					padding: '0 24px 16px',
 				}}
 			>
 				<Button
