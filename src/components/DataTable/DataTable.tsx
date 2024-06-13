@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ChangeEvent, useState } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, TextField, InputAdornment, Button, Grid, IconButton, CircularProgress, useMediaQuery, useTheme, Typography, Box } from '@mui/material';
+import React, { ChangeEvent, useState } from 'react';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, TextField, InputAdornment, Button, Grid, IconButton, CircularProgress, Typography, Box, Collapse } from '@mui/material';
 import { Search as SearchIcon, Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, Category as CategoryIcon, ArrowUpward as ArrowUpwardIcon, ArrowDownward as ArrowDownwardIcon } from '@mui/icons-material';
 import { formatDate } from '../../utils/helpers';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
 interface DataTableProps {
 	tableLabel: string;
@@ -15,14 +17,18 @@ interface DataTableProps {
 }
 
 const DataTable = ({ tableLabel, headers, data, onAddNew, onEdit, onDelete, loading }: DataTableProps) => {
-	const theme = useTheme();
-	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
 	const [page, setPage] = useState<number>(0);
 	const [rowsPerPage, setRowsPerPage] = useState<number>(10);
 	const [searchQuery, setSearchQuery] = useState<string>('');
 	const [order, setOrder] = useState<'asc' | 'desc'>('asc');
 	const [orderBy, setOrderBy] = useState<string>('');
+
+	const [openedRow, setOpenedRow] = useState(-1);
+
+	// Handle row click
+	const handleClick = (rowIndex: number) => {
+		setOpenedRow((prevIndex) => (prevIndex === rowIndex ? -1 : rowIndex));
+	};
 
 	// Handle pagination
 	const handleChangePage = (_event: unknown, newPage: number) => {
@@ -153,6 +159,9 @@ const DataTable = ({ tableLabel, headers, data, onAddNew, onEdit, onDelete, load
 								color='primary'
 								onClick={onAddNew}
 								startIcon={<AddIcon />}
+								sx={{
+									width: '100%',
+								}}
 							>
 								Add New
 							</Button>
@@ -169,6 +178,7 @@ const DataTable = ({ tableLabel, headers, data, onAddNew, onEdit, onDelete, load
 						}}
 					>
 						<TableRow>
+							<TableCell />
 							{headers.map((header, index) => {
 								const formattedHeader = header === 'createdAt' ? 'Date Created' : header === 'updatedAt' ? 'Date Updated' : header;
 								return (
@@ -199,6 +209,20 @@ const DataTable = ({ tableLabel, headers, data, onAddNew, onEdit, onDelete, load
 						sx={{
 							td: {
 								padding: '8px 16px',
+								minWidth: '190px',
+								maxWidth: '190px',
+								'@media screen and (max-width:800px)': {
+									minWidth: '150px',
+									maxWidth: '150px',
+								},
+							},
+							'.shortCol': {
+								minWidth: '100px!important',
+								maxWidth: '100px!important',
+							},
+							'.photoCol': {
+								minWidth: '125px!important',
+								maxWidth: '125px!important',
 							},
 							tr: {
 								'&:hover': {
@@ -210,7 +234,7 @@ const DataTable = ({ tableLabel, headers, data, onAddNew, onEdit, onDelete, load
 						{loading ? (
 							<TableRow>
 								<TableCell
-									colSpan={headers.length + 1}
+									colSpan={headers.length + 2}
 									align='center'
 								>
 									<CircularProgress />
@@ -219,7 +243,7 @@ const DataTable = ({ tableLabel, headers, data, onAddNew, onEdit, onDelete, load
 						) : sortedData.length === 0 ? (
 							<TableRow>
 								<TableCell
-									colSpan={headers.length + 1}
+									colSpan={headers.length + 2}
 									align='center'
 								>
 									No data found
@@ -227,66 +251,125 @@ const DataTable = ({ tableLabel, headers, data, onAddNew, onEdit, onDelete, load
 							</TableRow>
 						) : (
 							sortedData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, rowIndex) => (
-								<TableRow key={rowIndex}>
-									{headers.map((header, colIndex) => (
+								<React.Fragment key={rowIndex}>
+									<TableRow>
+										{tableLabel === 'Items' && (
+											<TableCell className='shortCol'>
+												{row.variants && row.variants.length > 0 && (
+													<IconButton
+														aria-label='expand row'
+														size='small'
+														onClick={() => handleClick(rowIndex)}
+													>
+														{openedRow === rowIndex ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+													</IconButton>
+												)}
+											</TableCell>
+										)}
+
+										{tableLabel === 'Categories' && <TableCell className='shortCol' />}
+
+										{headers.map((header, colIndex) => (
+											<TableCell
+												key={colIndex}
+												style={{ width: tableLabel === 'Categories' && colIndex === 3 ? 450 : undefined }}
+												className={header === 'id' ? 'shortCol' : header === 'photo' ? 'photoCol' : ''}
+											>
+												{header === 'photo' ? (
+													<img
+														src={row[header] ? row[header] : 'https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png'}
+														alt='Item'
+														style={{ width: 50, height: 50, borderRadius: 8 }}
+													/>
+												) : header === 'id' ? (
+													rowIndex + 1
+												) : header === 'variants' ? (
+													''
+												) : typeof row[header] === 'string' ? (
+													row[header].charAt(0).toUpperCase() + row[header].slice(1)
+												) : (
+													row[header]
+												)}
+											</TableCell>
+										))}
 										<TableCell
-											key={colIndex}
-											style={{ width: tableLabel === 'Categories' && colIndex === 3 ? 450 : undefined }}
+											sx={{
+												minWidth: '190px',
+												maxWidth: '190px',
+												'> button': {
+													borderRadius: '4px',
+													color: '#ffffff',
+													'&.edit': {
+														background: '#ffbc34',
+													},
+													'&.delete': {
+														background: '#f62d51',
+													},
+													'&:last-of-type': {
+														margin: '0 0 0 8px',
+													},
+												},
+											}}
 										>
-											{header === 'photo' ? (
-												<img
-													src={row[header] ? row[header] : 'https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png'}
-													alt='Item'
-													style={{ width: 50, height: 50, borderRadius: 8 }}
-												/>
-											) : header === 'id' ? (
-												rowIndex + 1
-											) : header === 'variants' ? (
-												<ul>
-													{row[header].map((variant: any, index: number) => (
-														<li key={index}>
-															Name: {variant.name}, Price: {variant.price}, Cost: {variant.cost}
-														</li>
-													))}
-												</ul>
-											) : typeof row[header] === 'string' ? (
-												row[header].charAt(0).toUpperCase() + row[header].slice(1)
-											) : (
-												row[header]
-											)}
+											<IconButton
+												onClick={() => onEdit(row)}
+												className='edit'
+											>
+												<EditIcon />
+											</IconButton>
+											<IconButton
+												onClick={() => onDelete(row)}
+												className='delete'
+											>
+												<DeleteIcon />
+											</IconButton>
 										</TableCell>
-									))}
-									<TableCell
-										sx={{
-											'> button': {
-												borderRadius: '4px',
-												color: '#ffffff',
-												'&.edit': {
-													background: '#ffbc34',
-												},
-												'&.delete': {
-													background: '#f62d51',
-												},
-												'&:last-of-type': {
-													margin: isMobile ? '8px 0 0' : '0 0 0 8px',
-												},
-											},
-										}}
-									>
-										<IconButton
-											onClick={() => onEdit(row)}
-											className='edit'
+									</TableRow>
+									<TableRow>
+										<TableCell
+											sx={{ padding: '0!important' }}
+											colSpan={headers.length + 3}
 										>
-											<EditIcon />
-										</IconButton>
-										<IconButton
-											onClick={() => onDelete(row)}
-											className='delete'
-										>
-											<DeleteIcon />
-										</IconButton>
-									</TableCell>
-								</TableRow>
+											<Collapse
+												in={openedRow === rowIndex}
+												timeout='auto'
+												unmountOnExit
+											>
+												<Box>
+													<Table sx={{}}>
+														<TableBody
+															sx={{
+																td: {
+																	minWidth: '190px',
+																	maxWidth: '190px',
+																	'@media screen and (max-width:800px)': {
+																		minWidth: '150px',
+																		maxWidth: '150px',
+																	},
+																},
+															}}
+														>
+															{row.variants?.map((variant: { name: string; cost: number; price: number }, index: number) => (
+																<TableRow key={index}>
+																	<TableCell className='shortCol'></TableCell>
+																	<TableCell className='shortCol'></TableCell>
+																	<TableCell className='photoCol'></TableCell>
+																	<TableCell></TableCell>
+
+																	<TableCell></TableCell>
+																	<TableCell>{variant.name}</TableCell>
+																	<TableCell>{variant.cost}</TableCell>
+																	<TableCell>{variant.price}</TableCell>
+																	<TableCell />
+																</TableRow>
+															))}
+														</TableBody>
+													</Table>
+												</Box>
+											</Collapse>
+										</TableCell>
+									</TableRow>
+								</React.Fragment>
 							))
 						)}
 					</TableBody>
