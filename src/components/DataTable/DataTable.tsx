@@ -60,7 +60,15 @@ const DataTable = ({ tableLabel, headers, data, onAddNew, onEdit, onDelete, load
 		return order === 'desc' ? (a: any, b: any) => (b[orderBy] < a[orderBy] ? -1 : 1) : (a: any, b: any) => (a[orderBy] < b[orderBy] ? -1 : 1);
 	};
 
-	const filteredData = data.filter((row) => headers.some((header) => row[header].toString().toLowerCase().includes(searchQuery.toLowerCase())));
+	const filteredData = data.filter((row) =>
+		headers.some((header) => {
+			const cellValue = row[header];
+			if (cellValue !== undefined && cellValue !== null) {
+				return cellValue.toString().toLowerCase().includes(searchQuery.toLowerCase());
+			}
+			return false;
+		})
+	);
 
 	const formattedData = filteredData.map((row) => {
 		return {
