@@ -43,7 +43,7 @@ const Layout = () => {
 					variant='dense'
 					sx={{ justifyContent: 'space-between', boxShadow: 'rgba(0, 0, 0, 0.1) 0 1px' }}
 				>
-					<Header />
+					<Header handleDrawerToggle={handleShowSidebar} />
 				</Toolbar>
 			</AppBar>
 			<Box
@@ -61,7 +61,7 @@ const Layout = () => {
 				<Box
 					sx={{
 						flexGrow: 1,
-						marginLeft: isSidebarOpen && !isMobile ? '0' : '-260px',
+						marginLeft: isSidebarOpen && !isMobile ? '0' : isMobile ? '0' : '-260px',
 						background: '#f6f7f8',
 						padding: '125px 32px 32px',
 						width: '100%',

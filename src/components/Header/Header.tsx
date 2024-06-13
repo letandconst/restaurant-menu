@@ -1,10 +1,15 @@
-import { Box, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Button, Typography, useMediaQuery, useTheme } from '@mui/material';
 
 import { useEffect, useState } from 'react';
 import { ref, get } from 'firebase/database';
 import { auth, db } from '../../../firebase.config.ts';
+import MenuIcon from '@mui/icons-material/Menu';
 
-const Header = () => {
+interface HeaderProp {
+	handleDrawerToggle: () => void;
+}
+
+const Header = ({ handleDrawerToggle }: HeaderProp) => {
 	const [currentUser, setCurrentUser] = useState<string | null>(null);
 
 	const theme = useTheme();
@@ -51,6 +56,18 @@ const Header = () => {
 				>
 					Logo
 				</Box>
+				{isMobile && (
+					<Button
+						onClick={handleDrawerToggle}
+						variant='contained'
+						sx={{
+							width: '32px',
+							height: '52px',
+						}}
+					>
+						<MenuIcon />
+					</Button>
+				)}
 			</Box>
 			<Typography>Hello, {currentUser}</Typography>
 		</>

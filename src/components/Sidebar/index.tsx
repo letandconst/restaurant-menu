@@ -58,7 +58,7 @@ const Sidebar = ({ open, handleDrawerToggle }: SidebarProps) => {
 							right: '-32px',
 							display: 'flex',
 							justifyContent: 'center',
-							top: '57px',
+							top: '71px',
 						}}
 					>
 						<Box
