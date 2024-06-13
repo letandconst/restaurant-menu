@@ -9,9 +9,10 @@ const useItems = () => {
 	useEffect(() => {
 		const itemRef = ref(db, 'items');
 		const user = auth.currentUser;
+		let unsubscribe = () => {};
 
 		const fetchItems = () => {
-			onValue(
+			unsubscribe = onValue(
 				itemRef,
 				(snapshot) => {
 					const itemData = snapshot.val();
@@ -35,10 +36,12 @@ const useItems = () => {
 
 		if (user) {
 			fetchItems();
+		} else {
+			setLoading(false);
 		}
 
 		return () => {
-			onValue(itemRef, () => {});
+			unsubscribe();
 		};
 	}, []);
 	return { itemList, loading };

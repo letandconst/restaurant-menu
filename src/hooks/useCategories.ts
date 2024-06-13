@@ -10,9 +10,10 @@ const useCategories = () => {
 	useEffect(() => {
 		const categoryRef = ref(db, 'categories');
 		const user = auth.currentUser;
+		let unsubscribe = () => {};
 
 		const fetchCategories = () => {
-			onValue(
+			unsubscribe = onValue(
 				categoryRef,
 				(snapshot) => {
 					const categoriesData = snapshot.val();
@@ -37,10 +38,12 @@ const useCategories = () => {
 
 		if (user) {
 			fetchCategories();
+		} else {
+			setLoading(false);
 		}
 
 		return () => {
-			onValue(categoryRef, () => {});
+			unsubscribe();
 		};
 	}, []);
 	return { categoriesList, categoryNames, loading };
