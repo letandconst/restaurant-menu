@@ -8,8 +8,8 @@ import { getDownloadURL, uploadBytes, ref } from 'firebase/storage';
 
 import CategoryForm from './modules/CategoryForm.tsx';
 import { generateFilename } from '../../utils/helpers.tsx';
-import { Category } from '../../services/models/Category.ts';
 import useCategories from '../../hooks/useCategories.ts';
+import { Category } from '../../services/models/index.ts';
 
 const Categories = () => {
 	const [categories, setCategories] = useState<{ id: string }[]>([]);
