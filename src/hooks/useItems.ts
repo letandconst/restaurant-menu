@@ -1,29 +1,44 @@
 import { useState, useEffect } from 'react';
 import { onValue, ref } from 'firebase/database';
 import { auth, db } from '../../firebase.config';
+import { onAuthStateChanged } from 'firebase/auth';
 
 const useItems = () => {
 	const [itemList, setItemList] = useState<{ id: string }[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 
 	useEffect(() => {
-		const itemRef = ref(db, 'items');
-		const user = auth.currentUser;
 		let unsubscribe = () => {};
 
-		const fetchItems = () => {
+		const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+			if (!user) {
+				setLoading(false);
+				return;
+			}
+
+			const itemRef = ref(db, 'items');
+
 			unsubscribe = onValue(
 				itemRef,
 				(snapshot) => {
 					const itemData = snapshot.val();
-					const itemArray = [];
+
+					if (!itemData) {
+						console.warn('No data found');
+						setItemList([]);
+						setLoading(false);
+						return;
+					}
+
+					const itemsArr = [];
 
 					for (const key in itemData) {
-						if (itemData[key].merchantId === user?.uid) {
-							itemArray.push({ id: key, ...itemData[key] });
+						if (itemData[key].merchantId === user.uid) {
+							itemsArr.push({ id: key, ...itemData[key] });
 						}
 					}
-					setItemList(itemArray);
+
+					setItemList(itemsArr);
 
 					setLoading(false);
 				},
@@ -32,18 +47,14 @@ const useItems = () => {
 					setLoading(false);
 				}
 			);
-		};
-
-		if (user) {
-			fetchItems();
-		} else {
-			setLoading(false);
-		}
+		});
 
 		return () => {
+			unsubscribeAuth();
 			unsubscribe();
 		};
 	}, []);
+
 	return { itemList, loading };
 };
 

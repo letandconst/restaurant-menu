@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { onValue, ref } from 'firebase/database';
 import { auth, db } from '../../firebase.config';
+import { onAuthStateChanged } from 'firebase/auth';
 
 const useCategories = () => {
 	const [categoriesList, setCategoriesList] = useState<{ id: string }[]>([]);
@@ -8,23 +9,39 @@ const useCategories = () => {
 	const [loading, setLoading] = useState<boolean>(true);
 
 	useEffect(() => {
-		const categoryRef = ref(db, 'categories');
-		const user = auth.currentUser;
 		let unsubscribe = () => {};
 
-		const fetchCategories = () => {
+		const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+			if (!user) {
+				setLoading(false);
+				return;
+			}
+
+			const categoryRef = ref(db, 'categories');
+
 			unsubscribe = onValue(
 				categoryRef,
 				(snapshot) => {
 					const categoriesData = snapshot.val();
+
+					if (!categoriesData) {
+						console.warn('No data found');
+						setCategoriesList([]);
+						setCategoryNames([]);
+						setLoading(false);
+						return;
+					}
+
 					const categoriesArray = [];
 					const namesArray = [];
+
 					for (const key in categoriesData) {
-						if (categoriesData[key].merchantId === user?.uid) {
+						if (categoriesData[key].merchantId === user.uid) {
 							categoriesArray.push({ id: key, ...categoriesData[key] });
 							namesArray.push(categoriesData[key].name);
 						}
 					}
+
 					setCategoriesList(categoriesArray);
 					setCategoryNames(namesArray);
 					setLoading(false);
@@ -34,18 +51,14 @@ const useCategories = () => {
 					setLoading(false);
 				}
 			);
-		};
-
-		if (user) {
-			fetchCategories();
-		} else {
-			setLoading(false);
-		}
+		});
 
 		return () => {
+			unsubscribeAuth();
 			unsubscribe();
 		};
 	}, []);
+
 	return { categoriesList, categoryNames, loading };
 };
 
