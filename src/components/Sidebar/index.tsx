@@ -73,6 +73,7 @@ const SidebarContent = () => {
 		try {
 			await signOut(auth);
 			localStorage.removeItem('uid');
+			localStorage.removeItem('activeMenuItem');
 			navigate('/signin');
 		} catch (error) {
 			console.error(error);
