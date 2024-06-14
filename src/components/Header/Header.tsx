@@ -46,23 +46,27 @@ const Header = ({ handleDrawerToggle }: HeaderProp) => {
 				sx={{
 					width: isMobile ? 'max-content' : '260px',
 					display: 'flex',
-					padding: '16px 0',
+					padding: '6px 0',
 					alignItems: 'center',
 				}}
 			>
 				<Box
 					component='span'
-					sx={{ display: { xs: 'none', md: 'block' }, flexGrow: 1 }}
+					sx={{ display: { xs: 'none', sm: 'block' }, flexGrow: 1 }}
 				>
-					Logo
+					<img
+						src='logo.png'
+						style={{ height: '50px', display: 'flex' }}
+					/>
 				</Box>
 				{isMobile && (
 					<Button
 						onClick={handleDrawerToggle}
 						variant='contained'
 						sx={{
-							width: '32px',
-							height: '52px',
+							minWidth: 'auto',
+							width: '48px',
+							height: '48px',
 						}}
 					>
 						<MenuIcon />

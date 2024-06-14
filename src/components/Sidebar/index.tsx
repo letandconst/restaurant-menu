@@ -26,6 +26,7 @@ const Sidebar = ({ open, handleDrawerToggle }: SidebarProps) => {
 						'& .MuiDrawer-paper': {
 							width: '100%',
 							maxWidth: '260px',
+							padding: '0 16px 12px',
 						},
 					}}
 				>
@@ -44,7 +45,7 @@ const Sidebar = ({ open, handleDrawerToggle }: SidebarProps) => {
 						transition: 'transform 0.3s ease-in-out',
 
 						height: '100%',
-						padding: '72px 24px 12px',
+						padding: '100px 24px 12px',
 						background: '#ffffff',
 						position: 'relative',
 						boxShadow: '1px 0 6px rgba(0, 0, 0, 0.1)',
@@ -63,7 +64,8 @@ const Sidebar = ({ open, handleDrawerToggle }: SidebarProps) => {
 					>
 						<Box
 							sx={{
-								background: '#ffffff',
+								background: '#1e88e5',
+								color: '#ffffff',
 								width: '32px',
 								height: '32px',
 								display: 'flex',
@@ -71,11 +73,16 @@ const Sidebar = ({ open, handleDrawerToggle }: SidebarProps) => {
 								alignItems: 'center',
 								padding: '24px 0',
 								cursor: 'pointer',
-								transform: `rotate(${open ? '180deg' : '0deg'})`,
+								borderTopRightRadius: '8px',
+								borderBottomRightRadius: '8px',
 							}}
 							onClick={handleDrawerToggle}
 						>
-							<ArrowForwardIosIcon />
+							<ArrowForwardIosIcon
+								sx={{
+									transform: `rotate(${open ? '180deg' : '0deg'})`,
+								}}
+							/>
 						</Box>
 					</Box>
 				</Box>
@@ -129,6 +136,14 @@ const SidebarContent = () => {
 
 	return (
 		<>
+			{isMobile && (
+				<Box padding='24px 0 0'>
+					<img
+						src='logo.png'
+						style={{ width: '100%', height: '75px', objectFit: 'contain', display: 'flex' }}
+					/>
+				</Box>
+			)}
 			<Box>
 				<List
 					component='nav'
@@ -136,7 +151,7 @@ const SidebarContent = () => {
 						'& > * + *': {
 							marginTop: '8px',
 						},
-						padding: isMobile ? '18px' : '0',
+						padding: '0',
 					}}
 				>
 					{menuItems.map((menuItem, index) => (
