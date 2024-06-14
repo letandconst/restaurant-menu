@@ -156,6 +156,26 @@ const Login = () => {
 					</Grid>
 				</Grid>
 			</form>
+			<Box
+				sx={{
+					width: '100%',
+					mt: '24px',
+				}}
+			>
+				<Typography variant='body2'>
+					<Link
+						component={RouterLink}
+						to='/forgot-password'
+						color='primary'
+						sx={{
+							display: 'block',
+							textAlign: 'right',
+						}}
+					>
+						Forgot Password?
+					</Link>
+				</Typography>
+			</Box>
 		</FormWrapper>
 	);
 };

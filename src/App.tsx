@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { LoginForm, RegistrationForm, Dashboard, Items, Categories } from './screens';
+import { LoginForm, RegistrationForm, Dashboard, Items, Categories, ForgotPassword } from './screens';
 
 import { AuthRedirect, ProtectedRoute } from './utils';
 import Layout from './layout/Layout';
@@ -17,6 +17,10 @@ function App() {
 						<Route
 							path='/signin'
 							element={<LoginForm />}
+						/>
+						<Route
+							path='/forgot-password'
+							element={<ForgotPassword />}
 						/>
 					</Route>
 					<Route element={<ProtectedRoute />}>

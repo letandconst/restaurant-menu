@@ -15,7 +15,7 @@ const FormWrapper = ({ children, showPopup, message, type }: FormWrapperProps) =
 				backgroundSize: 'cover',
 				backgroundRepeaat: 'no-repeat',
 				width: '100%',
-
+				padding: '24px',
 				display: 'flex',
 				alignItems: 'center',
 				justifyContent: 'center',
