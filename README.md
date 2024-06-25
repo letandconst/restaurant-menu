@@ -38,3 +38,8 @@ You can now visit http://localhost:5173/, to see the running app.
 ## Demo
 
 https://simple-crud-for-menu.vercel.app/
+
+## Test Account
+
+Email: kaiju8@gmail.com
+Password: 123456
